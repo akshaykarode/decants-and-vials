@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://akshaykarode.github.io/decants-and-vials",
+  "homepage": "https://akshaykarode.github.io/decants-and-vials/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

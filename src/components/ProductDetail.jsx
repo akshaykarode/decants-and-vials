@@ -8,7 +8,7 @@ function ProductDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/data/products.json')
+    fetch('/decants-and-vials/data/products.json')
       .then(response => response.json())
       .then(data => {
         const foundProduct = data.find(p => p.id === parseInt(id));

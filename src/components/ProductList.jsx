@@ -10,7 +10,7 @@ function ProductList() {
 
   useEffect(() => {
     // Fetch products from static JSON
-    fetch('/data/products.json')
+    fetch('/decants-and-vials/data/products.json')
       .then(response => response.json())
       .then(data => {
         setProducts(data);

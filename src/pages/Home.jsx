@@ -17,24 +17,14 @@ function Home() {
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    // Fetch and merge both datasets
+    // Fetch and merge all datasets
     Promise.all([
-      fetch('/data/my-collection.json').then(res => res.json()),
-      fetch('/data/resale-samples.json').then(res => res.json())
+      fetch('/decants-and-vials/data/my-collection.json').then(res => res.json()),
+      fetch('/decants-and-vials/data/resale-official.json').then(res => res.json()),
+      fetch('/decants-and-vials/data/resale-samples.json').then(res => res.json()),
     ])
-      .then(([collection, resale]) => {
-        const collectionItems = collection.map(item => ({
-          ...item,
-          type: 'collection'
-        }));
-
-        const resaleItems = resale.map(item => ({
-          ...item,
-          type: 'official',
-          isOfficialVial: true
-        }));
-
-        const combined = [...collectionItems, ...resaleItems];
+      .then(([collection, resaleOfficial, resaleSamples]) => {
+        const combined = [...collection, ...resaleOfficial, ...resaleSamples];
         setAllFragrances(combined);
         setFilteredFragrances(combined);
       })
@@ -46,6 +36,10 @@ function Home() {
 
     if (filterBy === 'official') {
       filtered = filtered.filter(f => f.type === 'official');
+    } else if (filterBy === 'preloved') {
+      filtered = filtered.filter(f => f.type === 'preloved');
+    } else if (filterBy === 'collection') {
+      filtered = filtered.filter(f => f.type === 'collection');
     }
 
     // Apply sorting
@@ -100,7 +94,8 @@ function Home() {
         size,
         price,
         quantity: 1,
-        isOfficialVial: fragrance.isOfficialVial
+        isOfficialVial: fragrance.isOfficialVial,
+        isPreLoved: fragrance.isPreLoved
       }]);
     }
   };
@@ -129,17 +124,25 @@ function Home() {
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
+  const formatIndianCurrency = (amount) => {
+    return amount.toLocaleString('en-IN');
+  };
+
   const handleCheckout = () => {
     if (cart.length === 0) return;
 
-    const itemsList = cart.map((item, index) =>
-      `${index + 1}. ${item.name}${item.isOfficialVial ? ' (Official Vial)' : ''}\n   Size: ${item.size}\n   Price: ₹${item.price}\n   Quantity: ${item.quantity}\n   Subtotal: ₹${item.price * item.quantity}`
-    ).join('\n\n');
+    const itemsList = cart.map((item, index) => {
+      let badge = '';
+      if (item.isOfficialVial) badge = ' (Official Vial)';
+      else if (item.isPreLoved) badge = ' (TSM Samples)';
+
+      return `${index + 1}. ${item.name}${badge}\n   Size: ${item.size}\n   Price: ₹${item.price}\n   Quantity: ${item.quantity}\n   Subtotal: ₹${item.price * item.quantity}`;
+    }).join('\n\n');
 
     const total = calculateTotal();
 
     const whatsappMessage = encodeURIComponent(
-      `Hi, I would like to order these fragrances:\n\n${itemsList}\n\n*Total: ₹${total}*\n\nPlease confirm availability and shipping details.`
+      `Hi Akshay, I would like to order these fragrances:\n\n${itemsList}\n\n*Total: ₹${total}*\n\nPlease confirm availability and shipping details.`
     );
 
     window.open(`https://wa.me/918767578885?text=${whatsappMessage}`, '_blank');
@@ -150,12 +153,33 @@ function Home() {
       {/* Hero Section */}
       <div className="hero-section">
         <div className="hero-content">
-          <h1 className="hero-title">AKFraghead</h1>
-          <p className="hero-subtitle">Premium Fragrance Decants & Samples</p>
+          <div className="hero-badge">Curated Collection</div>
+          <h1 className="hero-title">The Fragrance Atelier</h1>
+          <p className="hero-subtitle">Luxury Scents, Refined Experience</p>
           <p className="hero-description">
-            Discover luxury fragrances without the commitment.
-            Try before you buy with our premium decants.
+            Experience the world's finest fragrances through expertly crafted decants.
+            Each bottle tells a story, waiting to become part of yours.
           </p>
+          <div className="hero-features">
+            <div className="feature-item">
+              <svg className="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Authentic</span>
+            </div>
+            <div className="feature-item">
+              <svg className="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+              <span>Premium Quality</span>
+            </div>
+            <div className="feature-item">
+              <svg className="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+              </svg>
+              <span>Curated Selection</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -201,55 +225,47 @@ function Home() {
                   <div className="cart-items">
                     {cart.map((item, index) => (
                       <div key={index} className="cart-item">
-                        <div className="cart-item-details">
-                          <div className="cart-item-header">
-                            <div className="cart-item-name">{item.name}</div>
-                            <button
-                              className="remove-item-btn"
-                              onClick={() => removeFromCart(index)}
-                              aria-label="Remove item"
-                            >
-                              ×
-                            </button>
-                          </div>
-
+                        <div className="cart-item-left">
+                          <div className="cart-item-name">{item.name}</div>
                           <div className="cart-item-meta">
                             {item.isOfficialVial && (
                               <span className="cart-official-badge">Official Vial</span>
                             )}
+                            {item.isPreLoved && (
+                              <span className="cart-preloved-badge">TSM Samples</span>
+                            )}
                             <span className="cart-size-badge">{item.size}</span>
                           </div>
+                        </div>
 
-                          <div className="cart-item-pricing">
-                            <div className="cart-price-row">
-                              <span className="cart-price-label">Price:</span>
-                              <span className="cart-price-value">₹{item.price}</span>
-                            </div>
-
-                            <div className="cart-quantity-row">
-                              <span className="cart-price-label">Quantity:</span>
-                              <div className="quantity-controls">
-                                <button
-                                  className="quantity-btn"
-                                  onClick={() => updateQuantity(index, item.quantity - 1)}
-                                >
-                                  -
-                                </button>
-                                <span className="quantity-value">{item.quantity}</span>
-                                <button
-                                  className="quantity-btn"
-                                  onClick={() => updateQuantity(index, item.quantity + 1)}
-                                >
-                                  +
-                                </button>
-                              </div>
-                            </div>
-
-                            <div className="cart-subtotal-row">
-                              <span className="cart-subtotal-label">Subtotal:</span>
-                              <span className="cart-subtotal-value">₹{item.price * item.quantity}</span>
+                        <div className="cart-item-right">
+                          <div className="cart-price-qty">
+                            <span className="cart-price-value">₹{formatIndianCurrency(item.price)}</span>
+                            <span className="price-qty-divider">×</span>
+                            <div className="quantity-controls">
+                              <button
+                                className="quantity-btn"
+                                onClick={() => updateQuantity(index, item.quantity - 1)}
+                              >
+                                -
+                              </button>
+                              <span className="quantity-value">{item.quantity}</span>
+                              <button
+                                className="quantity-btn"
+                                onClick={() => updateQuantity(index, item.quantity + 1)}
+                              >
+                                +
+                              </button>
                             </div>
                           </div>
+                          <span className="cart-subtotal-value">₹{formatIndianCurrency(item.price * item.quantity)}</span>
+                          <button
+                            className="remove-item-btn"
+                            onClick={() => removeFromCart(index)}
+                            aria-label="Remove item"
+                          >
+                            ×
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -257,7 +273,7 @@ function Home() {
 
                   <div className="cart-total">
                     <span className="cart-total-label">Total:</span>
-                    <span className="cart-total-value">₹{calculateTotal()}</span>
+                    <span className="cart-total-value">₹{formatIndianCurrency(calculateTotal())}</span>
                   </div>
 
                   <div className="cart-actions">
@@ -310,7 +326,9 @@ function Home() {
                 onChange={(e) => setFilterBy(e.target.value)}
               >
                 <option value="all">All Fragrances</option>
-                <option value="official">Official Vials Only</option>
+                <option value="collection">Decants</option>
+                <option value="official">Official Vials</option>
+                <option value="preloved">TSM Samples (Test Spray Missing)</option>
               </select>
             </div>
 
@@ -381,81 +399,110 @@ function Home() {
                 {filteredFragrances.map((fragrance) => (
                   <tr key={fragrance.id} className="fragrance-row">
                     <td className="name-cell">
-                      {fragrance.name}
-                      {fragrance.isOfficialVial && (
-                        <span className="official-badge">Official Vial</span>
+                      <div className="fragrance-name-wrapper">
+                        <span className="fragrance-name">{fragrance.name}</span>
+                        {fragrance.isOfficialVial && (
+                          <span className="official-badge">Official Vial</span>
+                        )}
+                        {fragrance.isPreLoved && (
+                          <span className="preloved-badge">TSM Samples</span>
+                        )}
+                      </div>
+                      {(fragrance.isOfficialVial || fragrance.isPreLoved) && fragrance.customSize && (
+                        <div className="custom-size-price">
+                          <span className="custom-size">{fragrance.customSize}</span>
+                          <span className="custom-price-divider">•</span>
+                          <span className="custom-price">₹{fragrance.customPrice}</span>
+                          <button
+                            className="inline-cart-btn"
+                            onClick={() => addToCart(fragrance, fragrance.customSize, fragrance.customPrice)}
+                            title="Add to cart"
+                          >
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                          </button>
+                        </div>
                       )}
                     </td>
                     {visibleColumns.ml_30 && (
                       <td className="price-cell">
-                        {fragrance.ml_30 ? (
-                          <div className="price-with-cart">
-                            <span className="price-text">₹{fragrance.ml_30}</span>
-                            <button
-                              className="size-cart-btn"
-                              onClick={() => addToCart(fragrance, '30ml', fragrance.ml_30)}
-                              title="Add 30ml to cart"
-                            >
-                              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                              </svg>
-                            </button>
-                          </div>
-                        ) : '-'}
+                        {(fragrance.isOfficialVial || fragrance.isPreLoved) ? '-' :
+                          fragrance.ml_30 ? (
+                            <div className="price-with-cart">
+                              <span className="price-text">₹{fragrance.ml_30}</span>
+                              <button
+                                className="size-cart-btn"
+                                onClick={() => addToCart(fragrance, '30ml', fragrance.ml_30)}
+                                title="Add 30ml to cart"
+                              >
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                              </button>
+                            </div>
+                          ) : '-'
+                        }
                       </td>
                     )}
                     {visibleColumns.ml_20 && (
                       <td className="price-cell">
-                        {fragrance.ml_20 ? (
-                          <div className="price-with-cart">
-                            <span className="price-text">₹{fragrance.ml_20}</span>
-                            <button
-                              className="size-cart-btn"
-                              onClick={() => addToCart(fragrance, '20ml', fragrance.ml_20)}
-                              title="Add 20ml to cart"
-                            >
-                              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                              </svg>
-                            </button>
-                          </div>
-                        ) : '-'}
+                        {(fragrance.isOfficialVial || fragrance.isPreLoved) ? '-' :
+                          fragrance.ml_20 ? (
+                            <div className="price-with-cart">
+                              <span className="price-text">₹{fragrance.ml_20}</span>
+                              <button
+                                className="size-cart-btn"
+                                onClick={() => addToCart(fragrance, '20ml', fragrance.ml_20)}
+                                title="Add 20ml to cart"
+                              >
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                              </button>
+                            </div>
+                          ) : '-'
+                        }
                       </td>
                     )}
                     {visibleColumns.ml_10 && (
                       <td className="price-cell">
-                        {fragrance.ml_10 ? (
-                          <div className="price-with-cart">
-                            <span className="price-text">₹{fragrance.ml_10}</span>
-                            <button
-                              className="size-cart-btn"
-                              onClick={() => addToCart(fragrance, '10ml', fragrance.ml_10)}
-                              title="Add 10ml to cart"
-                            >
-                              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                              </svg>
-                            </button>
-                          </div>
-                        ) : '-'}
+                        {(fragrance.isOfficialVial || fragrance.isPreLoved) ? '-' :
+                          fragrance.ml_10 ? (
+                            <div className="price-with-cart">
+                              <span className="price-text">₹{fragrance.ml_10}</span>
+                              <button
+                                className="size-cart-btn"
+                                onClick={() => addToCart(fragrance, '10ml', fragrance.ml_10)}
+                                title="Add 10ml to cart"
+                              >
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                              </button>
+                            </div>
+                          ) : '-'
+                        }
                       </td>
                     )}
                     {visibleColumns.ml_5 && (
                       <td className="price-cell">
-                        {fragrance.ml_5 ? (
-                          <div className="price-with-cart">
-                            <span className="price-text">₹{fragrance.ml_5}</span>
-                            <button
-                              className="size-cart-btn"
-                              onClick={() => addToCart(fragrance, '5ml', fragrance.ml_5)}
-                              title="Add 5ml to cart"
-                            >
-                              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                              </svg>
-                            </button>
-                          </div>
-                        ) : '-'}
+                        {(fragrance.isOfficialVial || fragrance.isPreLoved) ? '-' :
+                          fragrance.ml_5 ? (
+                            <div className="price-with-cart">
+                              <span className="price-text">₹{fragrance.ml_5}</span>
+                              <button
+                                className="size-cart-btn"
+                                onClick={() => addToCart(fragrance, '5ml', fragrance.ml_5)}
+                                title="Add 5ml to cart"
+                              >
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                              </button>
+                            </div>
+                          ) : '-'
+                        }
                       </td>
                     )}
                   </tr>
@@ -491,7 +538,7 @@ function Home() {
         <div className="info-card contact-card">
           <h3 className="info-title">Get in Touch</h3>
           <a
-            href="https://wa.me/918767578885"
+            href="https://wa.me/918767578885?text=Hi Akshay, i am interested in samples."
             className="whatsapp-button"
             target="_blank"
             rel="noopener noreferrer"

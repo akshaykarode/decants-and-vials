@@ -227,7 +227,7 @@ function Home() {
                       <div key={index} className="cart-item">
                         <div className="cart-item-left">
                           <div className="cart-item-name">{item.name}</div>
-                          <div className="cart-item-meta">
+                          <div className="">
                             {item.isOfficialVial && (
                               <span className="cart-official-badge">Official Vial</span>
                             )}

@@ -1,0 +1,53 @@
+[
+  {
+    "id": 101,
+    "name": "Chanel Bleu de Chanel",
+    "customSize": "1.5ml",
+    "customPrice": 250,
+    "source": "Fragrance Vault",
+    "endSource": "Official Sample",
+    "type": "official",
+    "isOfficialVial": true
+  },
+{
+    "id": 102,
+    "name": "Yves Saint Laurent Y EDP",
+    "customSize": "1.5ml",
+    "customPrice": 225,
+    "source": "Scent Studio",
+    "endSource": "Official Sample",
+    "type": "official",
+    "isOfficialVial": true
+  },
+{
+    "id": 103,
+    "name": "Givenchy Gentleman Reserve Privee",
+    "customSize": "2ml",
+    "customPrice": 280,
+    "source": "Perfume Hub",
+    "endSource": "Official Sample",
+    "type": "official",
+    "isOfficialVial": true
+  },
+{
+    "id": 104,
+    "name": "Armaf Club de Nuit Intense",
+    "customSize": "2ml",
+    "customPrice": 280,
+    "source": "Local Seller",
+    "endSource": "Official Sample",
+    "type": "official",
+    "isOfficialVial": true
+  },
+{
+    "id": 105,
+    "name": "Versace Eros Flame",
+    "customSize": "1.5ml",
+    "customPrice": 240,
+    "source": "Fragrance Vault",
+    "endSource": "Official Sample",
+    "type": "official",
+    "isOfficialVial": true
+  }
+
+]

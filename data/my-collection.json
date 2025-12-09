@@ -6,7 +6,8 @@
     "ml_20": 1800,
     "ml_10": 900,
     "ml_5": 450,
-    "source": "Class Perfumes"
+    "source": "Class Perfumes",
+    "type": "collection"
   },
   {
     "id": 2,
@@ -15,7 +16,8 @@
     "ml_20": 2100,
     "ml_10": 1100,
     "ml_5": 550,
-    "source": "Own Collection"
+    "source": "Own Collection",
+    "type": "collection"
   },
   {
     "id": 3,
@@ -24,7 +26,8 @@
     "ml_20": 2300,
     "ml_10": 1200,
     "ml_5": 600,
-    "source": "Own Collection"
+    "source": "Own Collection",
+    "type": "collection"
   },
   {
     "id": 4,
@@ -33,7 +36,8 @@
     "ml_20": 2700,
     "ml_10": 1400,
     "ml_5": 700,
-    "source": "Own Collection"
+    "source": "Own Collection",
+    "type": "collection"
   },
   {
     "id": 5,
@@ -42,7 +46,8 @@
     "ml_20": 1900,
     "ml_10": 1000,
     "ml_5": 500,
-    "source": "Own Collection"
+    "source": "Own Collection",
+    "type": "collection"
   },
   {
     "id": 6,
@@ -51,7 +56,8 @@
     "ml_20": 1750,
     "ml_10": 900,
     "ml_5": 450,
-    "source": "Own Collection"
+    "source": "Own Collection",
+    "type": "collection"
   },
   {
     "id": 7,
@@ -60,7 +66,8 @@
     "ml_20": 2100,
     "ml_10": 1100,
     "ml_5": 550,
-    "source": "Own Collection"
+    "source": "Own Collection",
+    "type": "collection"
   },
   {
     "id": 8,
@@ -69,6 +76,7 @@
     "ml_20": 2500,
     "ml_10": 1300,
     "ml_5": 650,
-    "source": "Own Collection"
+    "source": "Own Collection",
+    "type": "collection"
   }
 ]

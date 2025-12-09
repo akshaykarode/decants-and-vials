@@ -202,7 +202,7 @@ body {
   cursor: pointer;
   box-shadow: var(--shadow-xl);
   transition: var(--transition);
-  z-index: 90;
+  z-index: 500;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1136,15 +1136,18 @@ body {
   }
 
   .cart-fab {
+    position: fixed !important;
+    display: flex !important;
     bottom: 1.5rem;
     right: 1.5rem;
-    width: 56px;
-    height: 56px;
+    width: 60px;
+    height: 60px;
+    z-index: 500 !important;
   }
 
   .cart-icon {
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
   }
 
   .cart-panel {
